@@ -1,19 +1,23 @@
 import java.awt.Dimension;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.IOException;
+import java.sql.Array;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
-
 import javax.swing.JFrame;
 
 import fieldObjects.SnakeHead;
 import game.Field;
 import game.Game;
 import game.Levels;
+import game.Level;
 import gui.CUI;
 import gui.GUI;
+import utils.Consts;
 import utils.Point;
 
 public class Main {
@@ -46,13 +50,13 @@ public class Main {
 		}
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		Map<Integer,Point> wasd = new HashMap<Integer,Point>();
 		wasd.put(87,  new Point(0,-1));
 		wasd.put(65,  new Point(-1,0));
 		wasd.put(83,  new Point(0,1));
 		wasd.put(68,  new Point(1,0));
-		Field field = Levels.Level1.initilize();
+		Field field = Level.initilize(Consts.levels[new Random().nextInt(Consts.levels.length)]);
 		Game game = new Game(field);
 		SnakeHead snakeHead = game.findSnakeHead();
 		if (args.length == 0) {
@@ -76,6 +80,11 @@ public class Main {
         frame.setResizable(false);
         frame.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
+            	//Point reversedDirection = new Point(snakeHead.getDirection().x*(-1),
+            	//									snakeHead.getDirection().y*(-1));
+            	//if (wasd.containsKey(e.getKeyCode()) && 
+            	//		!equalsDirection(wasd.get(e.getKeyCode()), reversedDirection))
+            	//	snakeHead.setDirection(wasd.get(e.getKeyCode()));
             	if (wasd.containsKey(e.getKeyCode()) && 
             			canChangeDirection(snakeHead, wasd.get(e.getKeyCode()))) {
             		snakeHead.setDirection(wasd.get(e.getKeyCode()));
@@ -83,8 +92,10 @@ public class Main {
             	}
           });
         frame.add(gui);
+        //frame.setPreferredSize(new Dimension(width*size, height*size));
         frame.pack();
         frame.setVisible(true);
+        //frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 		while (!game.gameOver) {
 			try {
@@ -94,6 +105,7 @@ public class Main {
 			game.tick();
 			gui.onTick = true;
 			gui.repaint();
+			//gui.setVisible(true);
 		}
 	}
 	
